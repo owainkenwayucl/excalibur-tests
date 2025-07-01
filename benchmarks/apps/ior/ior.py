@@ -23,7 +23,7 @@ class StreamBenchmark(SpackTest):
 
     ## Executable
     executable = 'ior'
-    executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
+    ##executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
 
     ## Scheduler options
     tasks = parameter([1, 2])  # Used to set `num_tasks` in `__init__`.
@@ -43,33 +43,45 @@ class StreamBenchmark(SpackTest):
         self.num_tasks = self.tasks
         self.num_cpus_per_task = self.cpus_per_task
 
-
-    @run_after('setup')
-    def setup_variables(self):
-        # With `env_vars` you can set environment variables to be used in the
-        # job.  For example with `OMP_NUM_THREADS` we set the number of OpenMP
-        # threads (not actually used in this specific benchmark).  Note that
-        # this has to be done after setup because we need to add entries to
-        # ReFrame built-in `env_vars` variable.
-        self.env_vars['OMP_NUM_THREADS'] = f'{self.num_cpus_per_task}'
+   @run_before("run")
+    def set_options(self):
+        self.executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
 
 
-    # Function defining a sanity check.  See
-    # https://reframe-hpc.readthedocs.io/en/stable/regression_test_api.html
-    # for the API of ReFrame tests, including performance ones.
     @run_before('sanity')
     def set_sanity_patterns(self):
         # Check that the string `[RESULT][0]` appears in the standard output of
         # the program.
         self.sanity_patterns = sn.assert_found(r'Finished.*', self.stdout)
 
-    # A performance benchmark.
-    @run_before('performance')
-    def set_perf_patterns(self):
-        # This performance pattern parses the output of the program to extract
-        # the desired figure of merit.
-        self.perf_patterns = {
-            'flops': sn.extractsingle(
-                r'\[RESULT\]\[0\] Case 1 (\S+) Gflops/seconds',
-                self.stdout, 1, float),
-        }
+    @performance_function('MiB/s')
+    def read_bw(self):
+        return sn.extractsingle(self.patterns["read"], self.stdout,1, float)
+
+    @performance_function('MiB/s')
+    def write_bw(self):
+        return sn.extractsingle(self.patterns["write"], self.stdout,1, float)
+
+    @performance_function('IOPS')
+    def read_iops(self):
+        return sn.extractsingle(self.patterns["read"], self.stdout,2, float)
+
+    @performance_function('IOPS')
+    def write_iops(self):
+        return sn.extractsingle(self.patterns["write"], self.stdout,2, float)
+
+    @performance_function('seconds')
+    def read_latency(self):
+        return sn.extractsingle(self.patterns["read"], self.stdout,3, float)
+
+    @performance_function('seconds')
+    def write_latency(self):
+        return sn.extractsingle(self.patterns["write"], self.stdout,3, float)
+
+    @performance_function('KiB')
+    def test_xfersize(self):
+        return sn.extractsingle(self.patterns["read"], self.stdout,4, float)
+
+    @performance_function('KiB')
+    def test_blocksize(self):
+        return sn.extractsingle(self.patterns["read"], self.stdout,5, float)
