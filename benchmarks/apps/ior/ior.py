@@ -43,7 +43,7 @@ class StreamBenchmark(SpackTest):
         self.num_tasks = self.tasks
         self.num_cpus_per_task = self.cpus_per_task
 
-   @run_before("run")
+    @run_before("run")
     def set_options(self):
         self.executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
 
