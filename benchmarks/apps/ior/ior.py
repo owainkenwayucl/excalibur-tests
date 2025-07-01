@@ -11,8 +11,8 @@ import secrets
 class IORBenchmark(SpackTest):
 
     # Run configuration
-    block_size = variable(str, value="8k")
-    transfer_size = variable(str, value="8k")
+    block_size = variable(str, value="1m")
+    transfer_size = variable(str, value="1m")
     directory = variable(str, value=".")
     filename = ''.join(secrets.choice(string.ascii_letters) for _ in range(16))
 
