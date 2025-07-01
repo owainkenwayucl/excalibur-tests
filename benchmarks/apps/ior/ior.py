@@ -14,7 +14,7 @@ class IORBenchmark(SpackTest):
     block_size = variable(str, value="8k")
     transfer_size = variable(str, value="8k")
     directory = variable(str, value=".")
-    filename = ''.join(secrets.choice(string.ascii_letters)) for _ in range(16)
+    filename = ''.join(secrets.choice(string.ascii_letters) for _ in range(16))
 
     patterns = {
         "read":r'read\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
