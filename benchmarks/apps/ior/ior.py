@@ -26,7 +26,7 @@ class IORBenchmark(SpackTest):
     ##executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
 
     ## Scheduler options
-    tasks = parameter([1, 2])  # Used to set `num_tasks` in `__init__`.
+    tasks = variable(int, value=2)  # Used to set `num_tasks` in `__init__`.
     cpus_per_task = 1
 
     time_limit = '5m'
