@@ -5,7 +5,7 @@ from reframe.core.backends import getlauncher
 from benchmarks.modules.utils import SpackTest
 
 @rfm.simple_test
-class StreamBenchmark(SpackTest):
+class IORBenchmark(SpackTest):
 
     # Run configuration
     block_size = variable(str, value="8k")
