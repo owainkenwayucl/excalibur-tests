@@ -4,12 +4,18 @@ import reframe.utility.sanity as sn
 from reframe.core.backends import getlauncher
 from benchmarks.modules.utils import SpackTest
 
+import string
+import secrets
+
 @rfm.simple_test
 class IORBenchmark(SpackTest):
 
     # Run configuration
     block_size = variable(str, value="8k")
     transfer_size = variable(str, value="8k")
+    directory = variable(str, value=".")
+    filename = ''.join(secrets.choice(string.ascii_letters)) for _ in range(16)
+
     patterns = {
         "read":r'read\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)',
         "write":r'write\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'
@@ -45,7 +51,7 @@ class IORBenchmark(SpackTest):
 
     @run_before("run")
     def set_options(self):
-        self.executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}"]
+        self.executable_opts = [f"-b={self.block_size}", f"-t={self.transfer_size}", f"-o {self.directory}/ior_test_{self.filename}"]
 
 
     @run_before('sanity')
